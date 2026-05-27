@@ -28,8 +28,15 @@ $myUsername = $_SESSION['iduser'];
         <div style="margin-bottom: 20px;">
             <a href="javascript:history.back()" class="btn btn-grey">&laquo; Kembali</a>
         </div>
-
+        <div class="top-header">
         <h2>Topik Diskusi Grup</h2>
+        <div class="notif-box">
+            <div class="notif-icon">
+                🔔
+                <span id="notifBadge">0</span>
+            </div>
+        </div>
+        </div>
 
         <div class="input-group">
             <input type="text" id="judulInput" placeholder="Tulis judul topik baru...">
@@ -60,7 +67,13 @@ $myUsername = $_SESSION['iduser'];
         const myUser = "<?php echo $myUsername; ?>";
 
         $(document).ready(function() {
+
             loadThreads();
+            loadMentionNotif();
+            setInterval(function(){
+                loadMentionNotif();
+            }, 1000);
+
         });
 
         function loadThreads() {
@@ -128,8 +141,31 @@ $myUsername = $_SESSION['iduser'];
                 }, 'json');
             }
         }
+
+        function loadMentionNotif(){
+
+            $.getJSON('chat_process.php', {
+
+                action: 'get_mention_count',
+                idgrup: idgrup
+
+            }, function(res){
+
+                if(res.total > 0){
+
+                    $('#notifBadge')
+                        .text(res.total)
+                        .fadeIn(200);
+
+                }else{
+
+                    $('#notifBadge').fadeOut(200);
+
+                }
+
+            });
+        }
     </script>
 
 </body>
-
 </html>

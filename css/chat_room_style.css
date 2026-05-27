@@ -117,30 +117,102 @@ body {
   background: var(--input-area-bg);
   padding: 10px;
   display: flex;
+  align-items: center;
   gap: 10px;
   border-top: 1px solid rgba(0, 0, 0, 0.1);
 }
 
+.mention-wrapper{
+    position:relative;
+    flex:1;
+    display:flex;
+}
+
 .input-area input {
-  flex: 1;
-  padding: 12px;
+  width:100%;
+  padding: 12px ;
   border-radius: 20px;
   border: 1px solid var(--input-border);
   background-color: var(--input-bg);
   color: var(--text-primary);
   outline: none;
+  box-sizing:border-box;
 }
 
 .input-area button {
   background: var(--btn-bg);
   color: white;
   border: none;
-  padding: 0 20px;
+  padding: 0 18px;
+  height: 45px;
   border-radius: 20px;
   font-weight: bold;
   cursor: pointer;
+  flex-shrink: 0;
 }
-
 .input-area button:hover {
   background: var(--btn-hover);
+}
+
+.plus-btn{
+    width:40px;
+    height:40px;
+    border-radius:50%;
+    background:#0b7a75;
+    color:white;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    cursor:pointer;
+    font-size:24px;
+}
+
+.mention-tag{
+    color:#1877f2;
+    font-weight:bold;
+}
+
+.chat-image{
+    max-width:220px;
+    border-radius:10px;
+    display:block;
+    margin-top:5px;
+}
+
+.bubble a{
+    color:#1877f2;
+    text-decoration:none;
+    font-weight:bold;
+}
+
+.bubble a:hover{
+    text-decoration:underline;
+}
+
+#mentionList{
+    position:absolute;
+    bottom:55px;
+    left:0;
+    width:100%;
+    background:var(--input-bg);
+    border-radius:15px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.2);
+    max-height:220px;
+    overflow-y:auto;
+    display:none;
+    z-index:999;
+}
+
+.mention-item{
+    padding:12px;
+    cursor:pointer;
+    border-bottom:1px solid rgba(0,0,0,0.05);
+}
+
+.mention-item:last-child{
+    border-bottom:none;
+}
+
+.mention-item:hover{
+    background:rgba(0,0,0,0.05);
 }

@@ -81,7 +81,7 @@ class ChatModel extends OrangTua
         return $stmt->execute();
     }
 
-    public function sendChat($idthread, $username, $isi)
+    public function sendChat($idthread,$username,$isi,$tipe_chat='text',$file_path=null)
     {
         $thread = $this->getThreadDetail($idthread);
 
@@ -89,10 +89,39 @@ class ChatModel extends OrangTua
             return false;
         }
 
-        $sql = "INSERT INTO chat (idthread, username_pembuat, isi, tanggal_pembuatan) VALUES (?, ?, ?, NOW())";
+        $sql = "INSERT INTO chat(idthread,username_pembuat,isi,tipe_chat,file_path,tanggal_pembuatan) VALUES (?, ?, ?, ?, ?, NOW())";
         $stmt = $this->mysqli->prepare($sql);
-        $stmt->bind_param("iss", $idthread, $username, $isi);
-        return $stmt->execute();
+        $stmt->bind_param( "issss",$idthread,$username,$isi,$tipe_chat,$file_path);
+
+        if ($stmt->execute()) {
+
+            $idchat = $stmt->insert_id;
+            preg_match_all('/@(\w+)/', $isi, $matches);
+            if (!empty($matches[1])) {
+
+                foreach ($matches[1] as $usernameMention) {
+
+                    $q = $this->mysqli->prepare("
+                        INSERT INTO mention_chat
+                        (idchat, username_mentioned, is_read)
+                        VALUES (?, ?, 0)
+                    ");
+
+                    $q->bind_param(
+                        "is",
+                        $idchat,
+                        $usernameMention
+                    );
+
+                    $q->execute();
+                }
+
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     public function getNewChats($idthread, $last_id_chat)
@@ -119,5 +148,81 @@ class ChatModel extends OrangTua
         }
 
         return $result;
+    }
+
+    public function getGroupMembers($idthread)
+    {
+        $sql = "
+            SELECT a.username,
+                   COALESCE(m.nama, d.nama) as nama
+
+            FROM thread t
+
+            JOIN member_grup gm
+                ON gm.idgrup = t.idgrup
+
+            JOIN akun a
+                ON a.username = gm.username
+
+            LEFT JOIN mahasiswa m
+                ON m.nrp = a.nrp_mahasiswa
+
+            LEFT JOIN dosen d
+                ON d.npk = a.npk_dosen
+
+            WHERE t.idthread = ?
+        ";
+
+        $stmt = $this->mysqli->prepare($sql);
+        $stmt->bind_param("i", $idthread);
+        $stmt->execute();
+        return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    }
+
+    public function getMentionCount($username, $idgrup)
+    {
+        $sql = "
+            SELECT COUNT(*) as total
+
+            FROM mention_chat mc
+
+            JOIN chat c
+                ON c.idchat = mc.idchat
+
+            JOIN thread t
+                ON t.idthread = c.idthread
+
+            WHERE mc.username_mentioned = ?
+            AND mc.is_read = 0
+            AND t.idgrup = ?
+        ";
+
+        $stmt = $this->mysqli->prepare($sql);
+
+        $stmt->bind_param("si", $username, $idgrup);
+
+        $stmt->execute();
+
+        return $stmt->get_result()->fetch_assoc()['total'];
+    }
+    public function readMention($idthread, $username)
+    {
+        $sql = "
+            UPDATE mention_chat mc
+
+            JOIN chat c
+                ON c.idchat = mc.idchat
+
+            SET mc.is_read = 1
+
+            WHERE c.idthread = ?
+            AND mc.username_mentioned = ?
+        ";
+
+        $stmt = $this->mysqli->prepare($sql);
+
+        $stmt->bind_param("is", $idthread, $username);
+
+        return $stmt->execute();
     }
 }
