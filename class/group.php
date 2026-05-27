@@ -80,22 +80,18 @@ class GroupModel extends OrangTua
 
     public function getGroupsByMember($username)
     {
-        $sql = "SELECT DISTINCT g.idgrup, g.nama, g.deskripsi, g.jenis, g.username_pembuat
-            FROM grup g
-            LEFT JOIN member_grup m ON g.idgrup = m.idgrup
-            WHERE g.username_pembuat = ?  
-               OR m.username = ?          
-            ORDER BY g.nama ASC";
-
+        $sql = "SELECT DISTINCT g.idgrup, g.nama, g.deskripsi, g.jenis, g.username_pembuat 
+                FROM grup g 
+                LEFT JOIN member_grup m ON g.idgrup = m.idgrup 
+                WHERE g.username_pembuat = ? OR (m.username = ? AND m.status_member = 'AKTIF')
+                ORDER BY g.nama ASC";
+                
         $stmt = $this->mysqli->prepare($sql);
         $stmt->bind_param("ss", $username, $username);
         $stmt->execute();
         $result = $stmt->get_result();
 
-        if ($result) {
-            return $result->fetch_all(MYSQLI_ASSOC);
-        }
-        return [];
+        return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
     }
 
 
@@ -161,15 +157,46 @@ class GroupModel extends OrangTua
         $stmt = $this->mysqli->prepare("INSERT INTO member_grup (idgrup, username) VALUES (?, ?)");
         $stmt->bind_param("is", $idgrup, $username);
 
-        if ($stmt->execute()) return 'success';
+        if ($stmt->execute())
+            return 'success';
         return $this->checkDuplicateError() ? 'duplicate' : 'error';
+    }
+
+    public function getArchiveGroupsByMember($username)
+    {
+        $sql = "SELECT g.*
+                FROM member_grup mg
+                JOIN grup g ON mg.idgrup = g.idgrup
+                WHERE mg.username = ?
+                AND mg.status_member = 'KELUAR'";
+
+        $stmt = $this->mysqli->prepare($sql);
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $data = [];
+
+        while ($row = $result->fetch_assoc()) {
+            $data[] = $row;
+        }
+
+        return $data;
     }
 
     public function leaveGroup($idgrup, $username)
     {
-        $stmt = $this->mysqli->prepare("DELETE FROM member_grup WHERE idgrup = ? AND username = ?");
-        $stmt->bind_param("is", $idgrup, $username);
-        $stmt->execute();
-        return ($stmt->affected_rows > 0);
+        $sql = "UPDATE member_grup
+                SET status_member = 'KELUAR'
+                WHERE idgrup = ?
+                AND username = ?";
+
+        $stmt = $this->mysqli->prepare($sql);
+        $stmt->bind_param(
+            "is",
+            $idgrup,
+            $username
+        );
+
+        return $stmt->execute();
     }
 }

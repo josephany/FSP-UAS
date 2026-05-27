@@ -61,11 +61,26 @@ if ($action == 'join_group') {
 
 if ($action == 'leave_group') {
     $idgrup = $_POST['idgrup'];
+    $hasil = $groupModel->leaveGroup(
+        $idgrup,
+        $username_mhs
+    );
 
-    if ($groupModel->leaveGroup($idgrup, $username_mhs)) {
-        echo json_encode(['status' => 'success', 'pesan' => 'Anda telah keluar dari grup.']);
+    if ($hasil) {
+        echo json_encode(['status' => 'success', 'pesan' => 'Berhasil keluar dari grup']);
     } else {
-        echo json_encode(['status' => 'error', 'pesan' => 'Gagal keluar grup.']);
+        echo json_encode(['status' => 'error', 'pesan' => 'Gagal keluar grup']);
     }
+    exit();
+}
+
+if ($action == 'list_archive_groups') {
+    $data = $groupModel->getArchiveGroupsByMember($username_mhs);
+
+    if (!$data) {
+        $data = [];
+    }
+
+    echo json_encode($data);
     exit();
 }

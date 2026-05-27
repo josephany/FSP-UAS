@@ -49,44 +49,126 @@ $username_mhs = $_SESSION['iduser'];
                 </tbody>
             </table>
         </div>
+
+        <div class="tampilan-laptop" style="margin-top:40px;">
+            <h3>Grup Arsip</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nama Grup</th>
+                        <th>Deskripsi</th>
+                        <th>Dosen Pembuat</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="listGrupArsip">
+                    <tr>
+                        <td colspan="5" align="center"> Memuat data... </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
     <script>
         const urlProses = 'group_home_mahasiswa_process.php';
 
-        $(document).ready(function() {
+        $(document).ready(function () {
             loadGrupSaya();
+            loadGrupArsip();
         });
 
         function loadGrupSaya() {
             $.ajax({
                 url: urlProses,
                 type: 'GET',
-                data: {
-                    action: 'list_my_groups'
-                },
+                data: { action: 'list_my_groups' },
                 dataType: 'json',
-                success: function(data) {
+                success: function (data) {
                     let html = '';
+
                     if (data.length > 0) {
-                        $.each(data, function(i, item) {
+                        $.each(data, function (i, item) {
+
                             html += `
-                                <tr>
-                                    <td><b>${item.nama}</b></td>
-                                    <td>${item.deskripsi}</td>
-                                    <td>${item.username_pembuat}</td>
-                                    <td>
-                                        <a href="detail_group_mahasiswa.php?id=${item.idgrup}" class="btn btn-hijau">Detail</a>
-                                        
-                                        <a href="list_thread.php?idgrup=${item.idgrup}" class="btn btn-biru">Forum</a>
-                                        
-                                        <button class="btn btn-merah" onclick="keluarGrup('${item.idgrup}')">Keluar</button>
-                                    </td>
-                                </tr>`;
+                            <tr>
+                                <td>
+                                    <b>${item.nama}</b>
+                                </td>
+                                <td>
+                                    ${item.deskripsi}
+                                </td>
+                                <td>
+                                    ${item.username_pembuat}
+                                </td>
+                                <td>
+                                    <a href="detail_group_mahasiswa.php?id=${item.idgrup}" 
+                                       class="btn btn-hijau">
+                                       Detail
+                                    </a>
+                                    <a href="list_thread.php?idgrup=${item.idgrup}" 
+                                       class="btn btn-biru">
+                                       Forum
+                                    </a>
+                                    <button class="btn btn-merah"
+                                            onclick="keluarGrup('${item.idgrup}')">
+                                            Keluar
+                                    </button>
+                                </td>
+                            </tr>`;
                         });
+
                     } else {
-                        html = '<tr><td colspan="4" align="center">Anda belum mengikuti grup apapun.</td></tr>';
+                        html = `
+                        <tr>
+                            <td colspan="4" align="center">
+                                Anda belum mengikuti grup apapun.
+                            </td>
+                        </tr>`;
                     }
                     $('#listGrupSaya').html(html);
+                }
+            });
+        }
+
+        function loadGrupArsip() {
+            $.ajax({
+                url: urlProses,
+                type: 'GET',
+                data: { action: 'list_archive_groups' },
+                dataType: 'json',
+
+                success: function (data) {
+                    let html = '';
+
+                    if (data.length > 0) {
+                        $.each(data, function (i, item) {
+                            html += `
+                            <tr>
+                                <td>
+                                    <b>${item.nama}</b>
+                                </td>
+                                <td>
+                                    ${item.deskripsi}
+                                </td>
+                                <td>
+                                    ${item.username_pembuat}
+                                </td>
+                                <td>
+                                    <span style="color:gray;">
+                                        Anda sudah keluar dari grup ini
+                                    </span>
+                                </td>
+                            </tr>`;
+                        });
+                    } else {
+                        html = `
+                        <tr>
+                            <td colspan="5" align="center">
+                                Tidak ada grup arsip.
+                            </td>
+                        </tr>`;
+                    }
+                    $('#listGrupArsip').html(html);
                 }
             });
         }
@@ -101,9 +183,15 @@ $username_mhs = $_SESSION['iduser'];
                         idgrup: id
                     },
                     dataType: 'json',
-                    success: function(response) {
+
+                    success: function (response) {
                         alert(response.pesan);
-                        if (response.status == 'success') loadGrupSaya();
+                        if (response.status == 'success') {
+
+                            loadGrupSaya();
+                            loadGrupArsip();
+
+                        }
                     }
                 });
             }
