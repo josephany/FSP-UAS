@@ -66,12 +66,16 @@ $myUsername = $_SESSION['iduser'];
         const idgrup = <?php echo $idgrup; ?>;
         const myUser = "<?php echo $myUsername; ?>";
 
-        $(document).ready(function() {
+         $(document).ready(function() {
 
             loadThreads();
             loadMentionNotif();
+
             setInterval(function(){
+
+                loadThreads();
                 loadMentionNotif();
+
             }, 1000);
 
         });
