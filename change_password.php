@@ -22,7 +22,7 @@ if (isset($_SESSION['password_status'])) {
     } elseif ($_SESSION['password_status'] == 'PWD_TERLALU_PANJANG') {
         $pesan = '<div class="alert error">Password baru terlalu panjang (maksimal 100 karakter)!</div>';
     }
-    unset($_SESSION['password_status']); eli
+    unset($_SESSION['password_status']);
 }
 ?>
 <!DOCTYPE html>
