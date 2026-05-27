@@ -1,0 +1,120 @@
+:root {
+  --bg-color: #f0f2f5;
+  --container-bg: #ffffff;
+  --text-color: #333333;
+  --border-color: #ddd;
+  --table-head-bg: #f8f9fa;
+  --table-row-hover: #f9f9f9;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+
+  --btn-blue: #007bff;
+  --btn-red: #dc3545;
+  --btn-grey: #6c757d;
+  --btn-green: #28a745;
+  --btn-purple: #6f42c1;
+  --btn-text: #ffffff;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-color: #121212;
+    --container-bg: #1e1e1e;
+    --text-color: #e0e0e0;
+    --border-color: #444444;
+    --table-head-bg: #2c2c2c;
+    --table-row-hover: #2a2a2a;
+    --shadow-color: rgba(0, 0, 0, 0.5);
+
+    --btn-blue: #375a7f;
+    --btn-red: #a72834;
+    --btn-grey: #545b62;
+    --btn-green: #218838;
+    --btn-purple: #59359a;
+  }
+}
+
+body {
+  font-family: "Segoe UI", sans-serif;
+  margin: 20px;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.3s, color 0.3s;
+}
+
+h2 {
+  margin-bottom: 20px;
+  margin-top: 0;
+}
+a {
+  text-decoration: none;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.btn {
+  padding: 8px 15px;
+  border-radius: 5px;
+  color: var(--btn-text);
+  text-decoration: none;
+  display: inline-block;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  margin-right: 5px;
+  margin-bottom: 5px;
+  transition: opacity 0.2s;
+}
+
+.btn:hover {
+  opacity: 0.9;
+}
+
+.btn-biru {
+  background-color: var(--btn-blue);
+}
+.btn-merah {
+  background-color: var(--btn-red);
+}
+.btn-abu {
+  background-color: var(--btn-grey);
+}
+.btn-hijau {
+  background-color: var(--btn-green);
+}
+.btn-ungu {
+  background-color: var(--btn-purple);
+}
+
+.tampilan-laptop {
+  background: var(--container-bg);
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px var(--shadow-color);
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 700px;
+}
+
+th,
+td {
+  padding: 12px;
+  border-bottom: 1px solid var(--border-color);
+  text-align: left;
+  color: var(--text-color);
+}
+
+th {
+  background-color: var(--table-head-bg);
+  font-weight: bold;
+}
+
+tr:hover {
+  background-color: var(--table-row-hover);
+}
